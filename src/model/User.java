@@ -4,13 +4,13 @@ public class User {
     private String name;
     private String email;
     private Integer age;
-    private Float heightM;
+    private Float height;
 
-    public User(String name, String email, Integer age, Float heightM) {
+    public User(String name, String email, Integer age, Float height) {
         this.name = name;
         this.email = email;
         this.age = age;
-        this.heightM = heightM;
+        this.height = height;
     }
 
     public String getName() {
@@ -37,11 +37,21 @@ public class User {
         this.age = age;
     }
 
-    public Float getHeightM() {
-        return heightM;
+    public Float getHeight() {
+        return height;
     }
 
-    public void setHeightM(Float heightM) {
-        this.heightM = heightM;
+    public void setHeight(Float height) {
+        this.height = height;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", age=" + age +
+                ", height=" + height +
+                '}';
     }
 }
