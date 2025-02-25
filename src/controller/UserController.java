@@ -11,27 +11,34 @@ public class UserController {
     private final List<String> questions = new ArrayList<>();
     private final List<String> userInputs = new ArrayList<>();
 
-    UserService userService;
+    private UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
     public void startUserRegister() {
-        readQuestionsFile();
+        try {
+            readQuestionsFile();
 
-        if (questions.isEmpty()) {
-            System.out.println("No questions added to forms");
-            return;
+            if (questions.isEmpty()) {
+                System.out.println("No questions added to forms");
+                return;
+            }
+
+            getUserInputs();
+
+            if (validateUserInputs(userInputs)) {
+                User user = userService.createUser(userInputs);
+                userService.saveUser(user);
+            }
+
+        } catch (RuntimeException e) {
+            System.out.printf("Error: %s%n", e.getMessage());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
-
-        getUserInputs();
-
-        if (validateUserInputs(userInputs)) {
-            User user = userService.createUser(userInputs);
-            userService.saveUser(user);
-        }
-
     }
 
     public void readQuestionsFile() {
