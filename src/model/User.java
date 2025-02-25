@@ -54,4 +54,8 @@ public class User {
                 ", height=" + height +
                 '}';
     }
+
+    public String getUppercasedName() {
+        return this.name.toUpperCase();
+    }
 }
