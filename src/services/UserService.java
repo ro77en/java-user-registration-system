@@ -3,8 +3,12 @@ package services;
 import model.User;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class UserService {
 
@@ -15,35 +19,36 @@ public class UserService {
 
     private List<User> usersList = new ArrayList<>();
 
-    public User createUser(List<String> userInputs) {
+    public User createUser(List<String> userInputs) throws IllegalArgumentException {
 
         String name = userInputs.get(0);
         String email = userInputs.get(1);
-        int age = Integer.parseInt(userInputs.get(2));
-        float height = Float.parseFloat(userInputs.get(3));
-
-        if (age < MIN_AGE || age > MAX_AGE) {
-            System.out.println("Invalid inputs. Age must be between 0 and 120.");
-            return null;
-        }
-
-        if (height < MIN_HEIGHT || height > MAX_HEIGHT) {
-            System.out.println("Invalid inputs. Height must be between 0.0 and 2.5 (meters)");
-            return null;
-        }
+        int age = isAgeValid(userInputs.get(2));
+        float height = isHeightValid(userInputs.get(3));
 
         User user = new User(name, email, age, height);
         usersList.add(user);
         return user;
     }
 
+    public Integer getFilesAmount() throws IOException {
+        try (Stream<Path> files = Files.list(Paths.get("src/resources/users/"))) {
+            int filesCount = (int) files.count();
 
-    public void saveUser(User user) {
-        String userName = user.getName().toUpperCase().replaceAll("\\s+", "");
+            return filesCount + 1;
 
-        File file = new File("src/resources/users/" + usersList.size() + "-" + userName + ".txt");
+        }
+    }
 
-        try (FileWriter fw = new FileWriter(file, true); BufferedWriter bw = new BufferedWriter(fw)) {
+
+    public void saveUser(User user) throws Exception {
+        String userName = user.getUppercasedName().replaceAll("\\s+", "");
+
+        File file = new File("src/resources/users/" + getFilesAmount() + "-" + userName + ".txt");
+
+        try (FileWriter fw = new FileWriter(file, true);
+             BufferedWriter bw = new BufferedWriter(fw);) {
+            System.out.println(usersList.size());
 
             bw.write(user.getName() + "\n");
             bw.write(user.getEmail() + "\n");
@@ -58,4 +63,21 @@ public class UserService {
             e.printStackTrace();
         }
     }
+
+    public Integer isAgeValid(String ageStr) {
+        int age = Integer.parseInt(ageStr);
+        if (age < MIN_AGE || age > MAX_AGE) {
+            throw new IllegalArgumentException("Invalid inputs. Age must be between " + MIN_AGE + " and " + MAX_AGE);
+        }
+        return age;
+    }
+
+    public Float isHeightValid(String heightStr) {
+        float height = Float.parseFloat(heightStr);
+        if (height < MIN_HEIGHT || height > MAX_HEIGHT) {
+            throw new IllegalArgumentException("Invalid inputs. Height must be between 0.0 and 2.5 (meters)");
+        }
+        return height;
+    }
+
 }
